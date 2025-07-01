@@ -1,9 +1,9 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, RefreshControl, ScrollView, SafeAreaView } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, RefreshControl, ScrollView, SafeAreaView, Platform, StatusBar } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import api from '../services/api';
 import { useFocusEffect } from 'expo-router';
-
+import Constants from 'expo-constants';
 export default function TransactionListScreen({ navigation }) {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,7 +11,7 @@ export default function TransactionListScreen({ navigation }) {
   const [selectedTab, setSelectedTab] = useState('all'); // 'all' | 'success' | 'failed'
   const [page, setPage] = useState(1);
   const limit = 5;
-
+ const statusBarHeight = Platform.OS === 'android' ? StatusBar.currentHeight : Constants.statusBarHeight;
   useFocusEffect(
     useCallback(() => {
       setPage(1);
@@ -121,7 +121,7 @@ export default function TransactionListScreen({ navigation }) {
     </View>
   );
 
-  return (<SafeAreaView style={{ flex: 1, backgroundColor: '#000',marginTop:30 }}>
+  return (<SafeAreaView style={{ flex: 1, backgroundColor: '#000',marginTop:statusBarHeight }}>
     <LinearGradient colors={['#000000', '#1a1a1a']} style={styles.gradient}>
       {loading ? (
         <View style={styles.loaderContainer}>

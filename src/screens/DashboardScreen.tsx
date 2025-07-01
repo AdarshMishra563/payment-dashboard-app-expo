@@ -32,9 +32,9 @@ if (loading) {
   return (
     <LinearGradient 
       colors={['#000000', '#1f1f1f']} 
-      style={[styles.container, { top: '50%' }]}
+      style={styles.container}
     >
-      <ActivityIndicator size="large" color="#fff" />
+      <ActivityIndicator style={{ top: '50%' }} size="large" color="#fff" />
     </LinearGradient>
   );
 }
@@ -47,9 +47,11 @@ if (loading) {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#000' }}>
+      <StatusBar barStyle="light-content" backgroundColor="#000" />
+
       <LinearGradient colors={['#000000', '#1f1f1f']} style={styles.container}>
 
-        <View style={{ height: statusBarHeight }} />  {/* Spacer for status bar */}
+        <View style={{ height: statusBarHeight }} /> 
 
         {/* Top Bar */}
         <View style={styles.topBar}>
@@ -71,7 +73,9 @@ if (loading) {
             <Text style={styles.statText}>Failed Payments: {stats.failedCount}</Text>
           </View>
 
-          <LineChart
+          {stats.payments.length === 0 ? (
+  <Text style={{color: '#ccc', fontSize: 16, marginTop: 20}}>No payment data available.</Text>
+) : (<LineChart
             data={{
               labels: labels,
               datasets: [{ data: amounts }],
@@ -111,7 +115,7 @@ if (loading) {
               );
             }}
             style={styles.chart}
-          />
+          />)}
         </ScrollView>
 
       </LinearGradient>
