@@ -8,8 +8,8 @@ import {Modal} from 'react-native';
 import api from '../services/api';
 
 export default function LoginScreen({ navigation }) {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('admin');
+  const [password, setPassword] = useState('password');
   const [loading, setLoading] = useState(false);
   const [errorModalVisible, setErrorModalVisible] = useState(false);
 
@@ -36,12 +36,14 @@ export default function LoginScreen({ navigation }) {
 
         <TextInput
           placeholder="Username"
+          value={username}
           placeholderTextColor="#9CA3AF"
           onChangeText={setUsername}
           style={styles.input}
         />
 
         <TextInput
+        value={password}
           placeholder="Password"
           placeholderTextColor="#9CA3AF"
           secureTextEntry
