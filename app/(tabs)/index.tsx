@@ -1,75 +1,85 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Ionicons } from '@expo/vector-icons';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+// Screens
+import LoginScreen from '../../src/screens/LoginScreen';
+import DashboardScreen from '../../src/screens/DashboardScreen';
+import TransactionListScreen from '../../src/screens/TransactionListScreen';
+import TransactionDetailsScreen from '../../src/screens/TransactionDetailsScreen';
+import AddPaymentScreen from '../../src/screens/AddPaymentScreen';
+import * as SecureStore from 'expo-secure-store';
 
-export default function HomeScreen() {
+// Type for stack params
+export type RootStackParamList = {
+  Login: undefined;
+  MainTabs: undefined;
+  TransactionDetails: { id: string };
+};
+
+// Type for tab params
+export type TabParamList = {
+  Dashboard: undefined;
+  Transactions: undefined;
+  AddPayment: undefined;
+};
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
+const Tab = createBottomTabNavigator<TabParamList>();
+
+// Tab navigator component
+function MainTabs() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarStyle: { backgroundColor: '#1f1f1f' },
+        tabBarActiveTintColor: '#ffa726',
+        tabBarInactiveTintColor: '#ccc',
+        tabBarIcon: ({ color, size }) => {
+          let iconName: string;
+
+          if (route.name === 'Dashboard') iconName = 'home';
+          else if (route.name === 'Transactions') iconName = 'list';
+          else if (route.name === 'AddPayment') iconName = 'add-circle';
+
+          return <Ionicons name={iconName as any} size={size} color={color} />;
+        },
+      })}
+    >
+      <Tab.Screen name="Dashboard" component={DashboardScreen} />
+      <Tab.Screen name="AddPayment" component={AddPaymentScreen} />
+      <Tab.Screen name="Transactions" component={TransactionListScreen} />
+      
+    </Tab.Navigator>
   );
 }
 
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});
+export default function App() {
+
+    const [isAuthenticated, setIsAuthenticated] = useState<null | boolean>(null);
+
+  useEffect(() => {
+    const checkToken = async () => {
+      const token = await SecureStore.getItemAsync('token');
+      setIsAuthenticated(!!token);
+    };
+    checkToken();
+  }, []);
+
+  return (
+    
+      <Stack.Navigator initialRouteName={isAuthenticated?"MainTabs":"Login"} screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="MainTabs" component={MainTabs} />
+        <Stack.Screen
+          name="Details"
+          component={TransactionDetailsScreen}
+          options={{ title: 'Transaction Details' }}
+        />
+      </Stack.Navigator>
+   
+  );
+}

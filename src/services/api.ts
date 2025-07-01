@@ -1,7 +1,7 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 
-const api = axios.create({ baseURL: 'http://localhost:3000' });
+const api = axios.create({ baseURL: 'https://payment-dashboard-backend-nestjs.onrender.com' });
 
 api.interceptors.request.use(async (config) => {
   const token = await SecureStore.getItemAsync('token');
